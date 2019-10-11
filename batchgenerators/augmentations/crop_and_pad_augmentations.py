@@ -17,8 +17,10 @@ import numpy as np
 from batchgenerators.augmentations.utils import pad_nd_image
 
 
-def center_crop(data, crop_size, seg=None):
-    return crop(data, seg, crop_size, 0, 'center')
+def center_crop(data, crop_size, seg=None,
+                pad_mode='constant', pad_kwargs={'constant_values': 0},
+                pad_mode_seg='constant', pad_kwargs_seg={'constant_values': 0}):
+    return crop(data, seg, crop_size, 0, 'center', pad_mode=pad_mode, pad_kwargs=pad_kwargs, pad_mode_seg=pad_mode_seg, pad_kwargs_seg=pad_kwargs_seg)
 
 
 def get_lbs_for_random_crop(crop_size, data_shape, margins):
@@ -141,8 +143,10 @@ def crop(data, seg=None, crop_size=128, margins=(0, 0, 0), crop_type="center",
     return data_return, seg_return
 
 
-def random_crop(data, seg=None, crop_size=128, margins=[0, 0, 0]):
-    return crop(data, seg, crop_size, margins, 'random')
+def random_crop(data, seg=None, crop_size=128, margins=[0, 0, 0],
+                pad_mode='constant', pad_kwargs={'constant_values': 0},
+                pad_mode_seg='constant', pad_kwargs_seg={'constant_values': 0}):
+    return crop(data, seg, crop_size, margins, 'random', pad_mode=pad_mode, pad_kwargs=pad_kwargs, pad_mode_seg=pad_mode_seg, pad_kwargs_seg=pad_kwargs_seg)
 
 
 def pad_nd_image_and_seg(data, seg, new_shape=None, must_be_divisible_by=None, pad_mode_data='constant',

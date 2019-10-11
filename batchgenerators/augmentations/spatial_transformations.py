@@ -265,15 +265,29 @@ def augment_spatial(data, seg, patch_size, patch_center_dist_from_border=30,
                     seg_result[sample_id, channel_id] = interpolate_img(seg[sample_id, channel_id], coords, order_seg,
                                                                         border_mode_seg, cval=border_cval_seg, is_seg=True)
         else:
+            # valid values: constant/edge/median/minimum/reflect/symmetric/etc
+            if border_mode_data == 'nearest':
+                border_pad_mode_data = 'edge'
+                pad_kwargs_data = {}
+            elif border_mode_data == 'constant':
+                border_pad_mode_data = border_mode_data
+                pad_kwargs_data = {'constant_values': border_cval_data}
+            if border_mode_seg == 'nearest':
+                border_pad_mode_seg = 'edge'
+                pad_kwargs_seg = {}
+            elif border_mode_seg == 'constant':
+                border_pad_mode_seg = border_mode_seg
+                pad_kwargs_seg = {'constant_values': border_cval_seg}
+
             if seg is None:
                 s = None
             else:
                 s = seg[sample_id:sample_id + 1]
             if random_crop:
                 margin = [patch_center_dist_from_border[d] - patch_size[d] // 2 for d in range(dim)]
-                d, s = random_crop_aug(data[sample_id:sample_id + 1], s, patch_size, margin)
+                d, s = random_crop_aug(data[sample_id:sample_id + 1], s, patch_size, margin, pad_mode=border_pad_mode_data, pad_kwargs=pad_kwargs_data, pad_mode_seg=border_pad_mode_seg, pad_kwargs_seg=pad_kwargs_seg)
             else:
-                d, s = center_crop_aug(data[sample_id:sample_id + 1], patch_size, s)
+                d, s = center_crop_aug(data[sample_id:sample_id + 1], patch_size, s, pad_mode=border_pad_mode_data, pad_kwargs=pad_kwargs_data, pad_mode_seg=border_pad_mode_seg, pad_kwargs_seg=pad_kwargs_seg)
             data_result[sample_id] = d[0]
             if seg is not None:
                 seg_result[sample_id] = s[0]
